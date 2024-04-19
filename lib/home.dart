@@ -133,7 +133,7 @@ class _MyHomePageState extends State<MyHomePage> {
         mapController: mapController,
         options: MapOptions(
           interactionOptions:
-              const InteractionOptions(flags: InteractiveFlag.none),
+              const InteractionOptions(flags: InteractiveFlag.none,),
           initialCenter:
               LatLng(pickedLocation!.latitude, pickedLocation!.longitude),
           initialZoom: 13.0,
