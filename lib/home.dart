@@ -167,50 +167,57 @@ class _MyHomePageState extends State<MyHomePage> {
           // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
           title: Text(widget.title),
         ),
-        body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Container(
-            height: 250,
-            width: double.infinity,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              border: Border.all(
-                width: 1,
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+        body: SingleChildScrollView(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            SizedBox(
+                height:
+                    MediaQuery.of(context).orientation == Orientation.portrait
+                        ? MediaQuery.of(context).size.height * 0.20
+                        : 0),
+            Container(
+              height: 250,
+              width: double.infinity,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  width: 1,
+                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                ),
               ),
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : previewContent,
             ),
-            child: isLoading
-                ? const Center(child: CircularProgressIndicator())
-                : previewContent,
-          ),
-          const SizedBox(height: 20),
-          Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ElevatedButton(
-                    onPressed: () => getLocation(),
-                    child: const Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [Text("Location"), Icon(Icons.location_on)],
-                    )),
-                pickedLocation != null
-                    ? Padding(
-                        padding: const EdgeInsets.only(left: 20.0),
-                        child: ElevatedButton(
-                            onPressed: () => openMapsSheet(context),
-                            child: const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text('Open in maps'),
-                                  SizedBox(width: 5),
-                                  Icon(Icons.map),
-                                ])),
-                      )
-                    : const SizedBox(),
-              ])
-        ]));
+            const SizedBox(height: 20),
+            Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ElevatedButton(
+                      onPressed: () => getLocation(),
+                      child: const Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [Text("Location"), Icon(Icons.location_on)],
+                      )),
+                  pickedLocation != null
+                      ? Padding(
+                          padding: const EdgeInsets.only(left: 20.0),
+                          child: ElevatedButton(
+                              onPressed: () => openMapsSheet(context),
+                              child: const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text('Open in maps'),
+                                    SizedBox(width: 5),
+                                    Icon(Icons.map),
+                                  ])),
+                        )
+                      : const SizedBox(),
+                ])
+          ]),
+        ));
   }
 
   Future<List> getLocationAddress(double latitude, double longitude) async {
@@ -261,6 +268,5 @@ class _MyHomePageState extends State<MyHomePage> {
         print(e);
       }
     }
-    
   }
 }
