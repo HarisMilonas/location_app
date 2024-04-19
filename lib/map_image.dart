@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:test_app/models/location.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
     super.key,
-    this.location = const PlaceLocation(
-      latitude: 37.98518680360116,
-      longitude: 23.727138589661514,
-      address: '',
-    ),
+    this.location = const LatLng(37.98518680360116, 23.727138589661514) 
   });
 
-  final PlaceLocation location;
+  final  LatLng location;
 
   @override
   State<MapScreen> createState() {
@@ -23,7 +18,6 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   LatLng? _pickedLocation;
-
   @override
   void initState() {
     super.initState();

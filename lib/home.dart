@@ -21,7 +21,7 @@ class _MyHomePageState extends State<MyHomePage> {
   loc.LocationData? locationData;
   PlaceLocation? selectedLocation;
   late final MapController mapController;
-  LatLng? pickedLocation;
+
   bool isLoading = false;
 
   @override
@@ -78,9 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
     double latitude;
     double longitude;
 
-    if (pickedLocation != null) {
-      latitude = pickedLocation!.latitude;
-      longitude = pickedLocation!.longitude;
+    if (selectedLocation != null) {
+      latitude = selectedLocation!.latitude;
+      longitude = selectedLocation!.longitude;
     } else {
       if (locationData == null) {
         return;
@@ -94,28 +94,35 @@ class _MyHomePageState extends State<MyHomePage> {
     final locationNow = PlaceLocation(
         latitude: latitude, longitude: longitude, address: address);
 
-    pickedLocation = null;
+    selectedLocation = null;
 
     if (mounted) {
-      setState(() {
-        isLoading = false;
-      });
-      final newLocation = await Navigator.of(context).push<LatLng>(
+      final newCoords = await Navigator.of(context).push<LatLng>(
         MaterialPageRoute(
           fullscreenDialog: true,
-          builder: (ctx) => MapScreen(location: locationNow),
+          builder: (ctx) => MapScreen(
+              location: LatLng(locationNow.latitude, locationNow.longitude)),
         ),
       );
-      if (newLocation != null) {
+      if (newCoords != null) {
         setState(() {
-          pickedLocation = newLocation;
+          selectedLocation = PlaceLocation(
+              latitude: newCoords.latitude,
+              longitude: newCoords.longitude,
+              address: '');
         });
       } else {
         setState(() {
-          pickedLocation = LatLng(locationNow.latitude, locationNow.longitude);
+          selectedLocation = PlaceLocation(
+              latitude: locationNow.latitude,
+              longitude: locationNow.longitude,
+              address: address);
         });
       }
     }
+    setState(() {
+      isLoading = false;
+    });
   }
 
   @override
@@ -128,40 +135,92 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
     );
 
-    if (pickedLocation != null) {
-      previewContent = FlutterMap(
-        mapController: mapController,
-        options: MapOptions(
-          interactionOptions:
-              const InteractionOptions(flags: InteractiveFlag.none,),
-          initialCenter:
-              LatLng(pickedLocation!.latitude, pickedLocation!.longitude),
-          initialZoom: 13.0,
-        ),
+    if (selectedLocation != null) {
+      previewContent = Stack(
         children: [
-          TileLayer(
-            urlTemplate:
-                'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
-            additionalOptions: const {'hl': 'en'},
-            subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
-          ),
-          MarkerLayer(
-            markers: [
-              Marker(
-                point:
-                    LatLng(pickedLocation!.latitude, pickedLocation!.longitude),
-                child: const Icon(
-                  Icons.location_on,
-                  size: 25,
-                  color: Colors.blue,
-                ),
+          FlutterMap(
+            mapController: mapController,
+            options: MapOptions(
+              interactionOptions: const InteractionOptions(
+                flags: InteractiveFlag.none,
+              ),
+              initialCenter: LatLng(
+                  selectedLocation!.latitude, selectedLocation!.longitude),
+              initialZoom: 13.0,
+            ),
+            children: [
+              TileLayer(
+                urlTemplate:
+                    'https://{s}.google.com/vt/lyrs=m&hl={hl}&x={x}&y={y}&z={z}',
+                additionalOptions: const {'hl': 'en'},
+                subdomains: const ['mt0', 'mt1', 'mt2', 'mt3'],
+              ),
+              MarkerLayer(
+                markers: [
+                  Marker(
+                    point: LatLng(selectedLocation!.latitude,
+                        selectedLocation!.longitude),
+                    child: const Icon(
+                      Icons.location_on,
+                      size: 25,
+                      color: Colors.blue,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
+          Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 5),
+                  decoration: const BoxDecoration(
+                      gradient: LinearGradient(
+                          colors: [Colors.black26, Colors.black87],
+                          begin: Alignment.topCenter,
+                          end: FractionalOffset.bottomCenter)),
+                  child: FutureBuilder(
+                    future: _getAddress(selectedLocation!.latitude,
+                        selectedLocation!.longitude),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return Text(
+                          snapshot.data!,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(color: Colors.white),
+                          softWrap: true,
+                        );
+                      }
+                      if (snapshot.hasError) {
+                        return const Text(
+                          "Could not find specified address",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(color: Colors.white),
+                          softWrap: true,
+                        );
+                      } else {
+                        return const Center(
+                          child: LinearProgressIndicator(
+                            color: Colors.white,
+                            minHeight: 8,
+                          ),
+                        );
+                      }
+                    },
+                  )
+                  //  Text(
+                  //   selectedLocation!.address,
+                  //   textAlign: TextAlign.center,
+                  //   style: const TextStyle(color: Colors.white),
+                  //   softWrap: true,
+                  // ),
+                  ))
         ],
       );
     }
-
     return Scaffold(
         appBar: AppBar(
           // backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -200,7 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [Text("Location"), Icon(Icons.location_on)],
                       )),
-                  pickedLocation != null
+                  selectedLocation != null
                       ? Padding(
                           padding: const EdgeInsets.only(left: 20.0),
                           child: ElevatedButton(
@@ -229,9 +288,9 @@ class _MyHomePageState extends State<MyHomePage> {
   openMapsSheet(context) async {
     try {
       final coords =
-          Coords(pickedLocation!.latitude, pickedLocation!.longitude);
+          Coords(selectedLocation!.latitude, selectedLocation!.longitude);
       final title = await _getAddress(
-          pickedLocation!.latitude, pickedLocation!.longitude);
+          selectedLocation!.latitude, selectedLocation!.longitude);
 
       final availableMaps = await MapLauncher.installedMaps;
 
