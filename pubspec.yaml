@@ -40,6 +40,10 @@ dependencies:
   latlong2: ^0.9.1
   geocoding: ^3.0.0
   map_launcher: ^3.3.0
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^14.1.4
+  flutter_adaptive_scaffold: ^0.1.11
 
 dev_dependencies:
   flutter_test:
