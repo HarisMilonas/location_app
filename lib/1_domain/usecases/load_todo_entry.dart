@@ -14,7 +14,7 @@ class LoadTodoEntry implements UseCase<ToDoEntry, ToDoEntryIdsParam> {
   Future<Either<Failure, ToDoEntry>> call(ToDoEntryIdsParam params) async {
     try {
       final loadedEntry =
-          todoRepository.readToDoEntry(params.collectionId, params.entryId);
+          await todoRepository.readToDoEntry(params.collectionId, params.entryId);
       return loadedEntry.fold((left) => Left(left), (right) => Right(right));
     } catch (e) {
       debugPrint(e.toString());

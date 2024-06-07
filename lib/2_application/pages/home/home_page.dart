@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_adaptive_scaffold/flutter_adaptive_scaffold.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:test_app/2_application/core/page_config.dart';
 import 'package:test_app/2_application/pages/dashboard/dashboard_page.dart';
+import 'package:test_app/2_application/pages/details/todo_detail_page.dart';
+import 'package:test_app/2_application/pages/home/cubit/navigation_todo_cubit.dart';
 import 'package:test_app/2_application/pages/overview/overview_page.dart';
 import 'package:test_app/2_application/pages/settings/settings_page.dart';
 import 'package:test_app/2_application/pages/task/task_page.dart';
@@ -81,7 +84,30 @@ class _HomePageState extends State<HomePage> {
         secondaryBody: SlotLayout(config: {
           Breakpoints.mediumAndUp: SlotLayout.from(
             key: const Key('secondary-body'),
-            builder: AdaptiveScaffold.emptyBuilder,
+            builder: widget.index != 1
+                ? null
+                : (_) => BlocBuilder<NavigationTodoCubit, NavigationTodoState>(
+                      builder: (context, state) {
+                        final selectedId = state.selectedCollectionId;
+                        //check also if we are on small screen
+                        final isSecondBodyDisplayed =
+                            Breakpoints.mediumAndUp.isActive(context);
+
+                        //and update it
+                        context
+                            .read<NavigationTodoCubit>()
+                            .secondBodyHasChanged(
+                                isSecondBodyDisplayed: isSecondBodyDisplayed);
+                        if (selectedId == null) {
+                          return const Placeholder();
+                        }
+                        return ToDoDetailPageProvider(
+                            //! We need to add key here because otherwise flutter won't rebuild the second page
+                            //! because it does not uderstand any difference! But if we change the key it will!
+                            key: Key(selectedId.value),
+                            collectionId: selectedId);
+                      },
+                    ),
           )
         }),
       )),

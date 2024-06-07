@@ -78,16 +78,16 @@ class TodoRepositoryMock implements TodoRepository {
 
   @override
   Future<Either<Failure, ToDoEntry>> updateToDoEntry(
-      CollectionId collectionId, ToDoEntry entry) {
+      {required CollectionId collectionId, required EntryId entryId}) {
     try {
-      todoEntries.removeWhere((item) => item.id == entry.id);
-
-      todoEntries.add(entry);
+      final index = todoEntries.indexWhere((element) => element.id == entryId);
+      final entryToUpdate = todoEntries[index];
+      final updatedEntry =
+          todoEntries[index].copyWith(isDone: !entryToUpdate.isDone);
+      todoEntries[index] = updatedEntry;
 
       return Future.delayed(
-        const Duration(milliseconds: 300),
-        () => Right(entry),
-      );
+          const Duration(seconds: 1), () => Right(updatedEntry));
     } on Exception catch (e) {
       return Future.value(Left(ServerFailure(stackTrace: e.toString())));
     }

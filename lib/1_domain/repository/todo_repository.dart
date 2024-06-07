@@ -14,5 +14,5 @@ abstract class TodoRepository {
       CollectionId collectionId);
 
   Future<Either<Failure, ToDoEntry>> updateToDoEntry(
-      CollectionId collectionId, ToDoEntry entry);
+      {required CollectionId collectionId, required EntryId entryId});
 }
