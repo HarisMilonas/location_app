@@ -14,10 +14,24 @@ class TodoDetailLoaded extends StatelessWidget {
     return SafeArea(
         child: Padding(
       padding: const EdgeInsets.all(8.0),
-      child: ListView.builder(
-          itemCount: entryIds.length,
-          itemBuilder: (context, index) => ToDoEntryItemProvider(
-              collectionId: collectionId, entryId: entryIds[index])),
+      child: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+                itemCount: entryIds.length,
+                itemBuilder: (context, index) => ToDoEntryItemProvider(
+                    collectionId: collectionId, entryId: entryIds[index])),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton.icon(
+            style: const ButtonStyle(
+                foregroundColor: WidgetStatePropertyAll(Colors.teal)),
+            onPressed: () {},
+            label: const Text('Add new'),
+            icon: const Icon(Icons.add_rounded),
+          ),
+        ],
+      ),
     ));
   }
 }

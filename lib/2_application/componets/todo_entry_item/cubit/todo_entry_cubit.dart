@@ -23,12 +23,12 @@ class TodoEntryCubit extends Cubit<TodoEntryState> {
 
   Future<void> fetch() async {
     try {
-      
+      emit(TodoEntryLoadingState());
       final entry = await loadTodoEntry.call(
           ToDoEntryIdsParam(collectionId: collectionId, entryId: entryId));
       entry.fold(
         (left) => emit(TodoEntryErrorState()),
-        (right) => emit(TodoEntryLoadedState(toDoEntry: right)),
+        (right) => emit(TodoEntryLoadedState(toDoEntry: entry.right)),
       );
     } on Exception {
       emit(TodoEntryErrorState());

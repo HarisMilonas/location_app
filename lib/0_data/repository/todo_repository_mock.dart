@@ -92,4 +92,16 @@ class TodoRepositoryMock implements TodoRepository {
       return Future.value(Left(ServerFailure(stackTrace: e.toString())));
     }
   }
+
+  @override
+  Future<Either<Failure, bool>> createToDoCollection(
+      {required TodoCollection collection}) {
+    try {
+      toDoCollections.add(collection);
+      return Future.delayed(
+          const Duration(milliseconds: 100), () => const Right(true));
+    } on Exception catch (e) {
+      return Future.value(Left(ServerFailure(stackTrace: e.toString())));
+    }
+  }
 }

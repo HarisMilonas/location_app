@@ -7,6 +7,11 @@ class TodoCollection extends Equatable {
   final String title;
   final ToDoColor color;
 
+  TodoCollection copyWith({String? title, ToDoColor? color}) {
+    return TodoCollection(
+        id: id, title: title ?? this.title, color: color ?? this.color);
+  }
+
   factory TodoCollection.empty() {
     return TodoCollection(
         id: CollectionId(), title: '', color: ToDoColor(colorIndex: 0));
