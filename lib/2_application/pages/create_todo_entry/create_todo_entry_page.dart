@@ -8,10 +8,25 @@ import 'package:test_app/2_application/core/form_value.dart';
 import 'package:test_app/2_application/core/page_config.dart';
 import 'package:test_app/2_application/pages/create_todo_entry/cubit/create_todo_entry_page_cubit.dart';
 
+typedef TodoEntryItemAddedCallback = Function();
+
+// callback class to refresh the items list
+class CreateToDoEntryPageExtra {
+  final CollectionId collectionId;
+  final TodoEntryItemAddedCallback todoEntryItemAddedCallback;
+
+  CreateToDoEntryPageExtra(
+      {required this.collectionId, required this.todoEntryItemAddedCallback});
+}
+
 class CreateTodoEntryPageProvider extends StatelessWidget {
-  const CreateTodoEntryPageProvider({super.key, required this.collectionId});
+  const CreateTodoEntryPageProvider(
+      {super.key,
+      required this.collectionId,
+      required this.todoEntryItemAddedCallback});
 
   final CollectionId collectionId;
+  final TodoEntryItemAddedCallback todoEntryItemAddedCallback;
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +36,18 @@ class CreateTodoEntryPageProvider extends StatelessWidget {
           addTodoEntry: CreateTodoEntry(
               todoRepository:
                   RepositoryProvider.of<TodoRepositoryMock>(context))),
-      child: const CreateTodoEntryPage(),
+      child: CreateTodoEntryPage(
+        todoEntryItemAddedCallback: todoEntryItemAddedCallback,
+      ),
     );
   }
 }
 
 class CreateTodoEntryPage extends StatefulWidget {
-  const CreateTodoEntryPage({super.key});
+  const CreateTodoEntryPage(
+      {super.key, required this.todoEntryItemAddedCallback});
+
+  final TodoEntryItemAddedCallback todoEntryItemAddedCallback;
 
   static const pageConfig = PageConfig(
     icon: Icons.add_task_rounded,
@@ -61,13 +81,17 @@ class _CreateTodoEntryPageState extends State<CreateTodoEntryPage> {
                       ValidationStatus.pending;
                   switch (currentValidationState) {
                     case ValidationStatus.error:
-                      return 'This field need at least 2 characters to be valid';
+                      return 'This field needs at least 2 characters to be valid';
                     case ValidationStatus.success:
                     case ValidationStatus.pending:
                       return null;
                   }
                 },
-                onChanged: (value) => context.read<CreateTodoEntryPageCubit>(),
+                onChanged: (value) {
+                  context
+                      .read<CreateTodoEntryPageCubit>()
+                      .descriptionChanged(description: value);
+                },
               ),
               const SizedBox(height: 16),
               ElevatedButton(
@@ -75,6 +99,7 @@ class _CreateTodoEntryPageState extends State<CreateTodoEntryPage> {
                     final isValid = _formKey.currentState?.validate();
                     if (isValid == true) {
                       context.read<CreateTodoEntryPageCubit>().submit();
+                      widget.todoEntryItemAddedCallback.call();
                       context.pop();
                     }
                   },

@@ -65,30 +65,36 @@ final routes = GoRouter(
         body: SafeArea(child: CreateTodoCollectionPage.pageConfig.child),
       ),
     ),
-     GoRoute(
-      name: CreateTodoEntryPage.pageConfig.name,
-      path: '$_basePath/overview/${CreateTodoEntryPage.pageConfig.name}',
-      builder: (context, state) => Scaffold(
-        appBar: AppBar(
-          title: const Text('create todo entry'),
-          leading: BackButton(
-            onPressed: () {
-              if (context.canPop()) {
-                context.pop();
-              } else {
-                context.goNamed(
-                  HomePage.pageConfig.name,
-                  pathParameters: {'tab': OverviewPage.pageConfig.name},
-                );
-              }
-            },
-          ),
-        ),
-        body: SafeArea(child: CreateTodoEntryPageProvider(collectionId:
-        // the difference betweeen extra and params is that params can be only a string where exra is an object 
-         state.extra as CollectionId,)),
-      ),
-    ),
+    GoRoute(
+        name: CreateTodoEntryPage.pageConfig.name,
+        path: '$_basePath/overview/${CreateTodoEntryPage.pageConfig.name}',
+        builder: (context, state) {
+          final castedExtras = state.extra as CreateToDoEntryPageExtra;
+
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('create todo entry'),
+              leading: BackButton(
+                onPressed: () {
+                  if (context.canPop()) {
+                    context.pop();
+                  } else {
+                    context.goNamed(
+                      HomePage.pageConfig.name,
+                      pathParameters: {'tab': OverviewPage.pageConfig.name},
+                    );
+                  }
+                },
+              ),
+            ),
+            body: SafeArea(
+              child: CreateTodoEntryPageProvider(
+                  todoEntryItemAddedCallback:
+                      castedExtras.todoEntryItemAddedCallback,
+                  collectionId: castedExtras.collectionId),
+            ),
+          );
+        }),
 
     GoRoute(
       name: TodoDetailPage.pageConfig.name,

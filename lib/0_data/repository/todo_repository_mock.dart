@@ -6,15 +6,7 @@ import 'package:test_app/1_domain/entitites/unique_id.dart';
 import 'package:test_app/1_domain/failures/failures.dart';
 import 'package:test_app/1_domain/repository/todo_repository.dart';
 
-class TodoRepositoryMock implements TodoRepository {
-  final List<ToDoEntry> todoEntries = List.generate(
-    100,
-    (index) => ToDoEntry(
-      id: EntryId.fromUniqueString(index.toString()),
-      description: 'description $index',
-      isDone: false,
-    ),
-  );
+
 
   final toDoCollections = List<TodoCollection>.generate(
     10,
@@ -27,6 +19,15 @@ class TodoRepositoryMock implements TodoRepository {
     ),
   );
 
+class TodoRepositoryMock implements TodoRepository {
+  final List<ToDoEntry> todoEntries = List.generate(
+    100,
+    (index) => ToDoEntry(
+      id: EntryId.fromUniqueString(index.toString()),
+      description: 'description $index',
+      isDone: false,
+    ),
+  );
   @override
   Future<Either<Failure, List<TodoCollection>>> readToDoCollections() {
     try {
@@ -62,8 +63,8 @@ class TodoRepositoryMock implements TodoRepository {
     try {
       final startIndex = int.parse(collectionid.value) * 10;
       int endIndex = startIndex + 10;
-      if (todoEntries.length > endIndex) {
-        endIndex = todoEntries.length - 1;
+      if (todoEntries.length < endIndex) {
+        endIndex = todoEntries.length;
       }
       final entryIds = todoEntries
           .sublist(startIndex, endIndex)
@@ -99,10 +100,13 @@ class TodoRepositoryMock implements TodoRepository {
   @override
   Future<Either<Failure, bool>> createToDoCollection(
       {required TodoCollection collection}) {
-    print('Adding the colletion');
+    final collectionToAdd = TodoCollection(
+        id: CollectionId.fromUniqueString(toDoCollections.length.toString()),
+        title: collection.title,
+        color: collection.color);
     try {
-      toDoCollections.add(collection);
-      print('Lenth: ${toDoCollections.length}');
+      toDoCollections.add(collectionToAdd);
+
       return Future.delayed(
           const Duration(milliseconds: 100), () => const Right(true));
     } on Exception catch (e) {

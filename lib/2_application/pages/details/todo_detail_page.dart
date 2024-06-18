@@ -9,6 +9,8 @@ import 'package:test_app/2_application/pages/details/view_states/todo_detail_err
 import 'package:test_app/2_application/pages/details/view_states/todo_detail_loaded.dart';
 import 'package:test_app/2_application/pages/details/view_states/todo_detail_loading.dart';
 
+
+
 class ToDoDetailPageProvider extends StatelessWidget {
   const ToDoDetailPageProvider({super.key, required this.collectionId});
 
@@ -39,7 +41,7 @@ class TodoDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TodoDetailCubit, TodoDetailState>(
       builder: (context, state) {
-        if (state is  TodoDetailLoadingState) {
+        if (state is TodoDetailLoadingState) {
           return const TodoDetailLoading();
         } else if (state is TodoDetailLoadedState) {
           return TodoDetailLoaded(
