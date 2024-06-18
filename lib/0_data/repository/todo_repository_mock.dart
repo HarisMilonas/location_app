@@ -61,7 +61,10 @@ class TodoRepositoryMock implements TodoRepository {
       CollectionId collectionid) {
     try {
       final startIndex = int.parse(collectionid.value) * 10;
-      final endIndex = startIndex + 10;
+      int endIndex = startIndex + 10;
+      if (todoEntries.length > endIndex) {
+        endIndex = todoEntries.length - 1;
+      }
       final entryIds = todoEntries
           .sublist(startIndex, endIndex)
           .map((entry) => entry.id)
@@ -96,10 +99,22 @@ class TodoRepositoryMock implements TodoRepository {
   @override
   Future<Either<Failure, bool>> createToDoCollection(
       {required TodoCollection collection}) {
+    print('Adding the colletion');
     try {
       toDoCollections.add(collection);
+      print('Lenth: ${toDoCollections.length}');
       return Future.delayed(
           const Duration(milliseconds: 100), () => const Right(true));
+    } on Exception catch (e) {
+      return Future.value(Left(ServerFailure(stackTrace: e.toString())));
+    }
+  }
+
+  @override
+  Future<Either<Failure, bool>> createToDoEntry({required ToDoEntry entry}) {
+    try {
+      todoEntries.add(entry);
+      return Future.value(const Right(true));
     } on Exception catch (e) {
       return Future.value(Left(ServerFailure(stackTrace: e.toString())));
     }

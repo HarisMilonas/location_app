@@ -39,7 +39,7 @@ class TodoDetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<TodoDetailCubit, TodoDetailState>(
       builder: (context, state) {
-        if (state is TodoDetailLoadingState) {
+        if (state is  TodoDetailLoadingState) {
           return const TodoDetailLoading();
         } else if (state is TodoDetailLoadedState) {
           return TodoDetailLoaded(

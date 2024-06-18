@@ -18,4 +18,8 @@ abstract class TodoRepository {
 
   Future<Either<Failure, bool>> createToDoCollection(
       {required TodoCollection collection});
+
+  Future<Either<Failure, bool>> createToDoEntry(
+      {required ToDoEntry entry});
+
 }

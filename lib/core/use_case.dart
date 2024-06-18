@@ -1,6 +1,7 @@
 import 'package:either_dart/either.dart';
 import 'package:equatable/equatable.dart';
 import 'package:test_app/1_domain/entitites/todo_collection.dart';
+import 'package:test_app/1_domain/entitites/todo_entry.dart';
 import 'package:test_app/1_domain/entitites/unique_id.dart';
 import 'package:test_app/1_domain/failures/failures.dart';
 
@@ -48,4 +49,17 @@ class ToDoCollectionParams extends Params {
 
   @override
   List<Object> get props => [collection];
+}
+
+
+
+class ToDoEntryParams extends Params {
+  ToDoEntryParams({
+    required this.entry,
+  }) : super();
+
+  final ToDoEntry entry;
+
+  @override
+  List<Object> get props => [entry];
 }
